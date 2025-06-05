@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List with sanjaykumar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <h1>Sanjay's Todo App</h1>
+      <div class="theme-toggle">
+        <button id="theme-switcher" aria-label="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <section class="greeting">
+      <h2 class="title">
+        What's up, <input type="text" id="name" placeholder="Name here">
+      </h2>
+    </section>
+
+    <section class="create-todo">
+      <h3>CREATE A TODO</h3>
+      <form id="new-todo-form">
+        <div class="input-group">
+          <input type="text" name="content" id="content" placeholder="E.g. Practicing coding challenges" required>
+          <button type="submit" class="add-btn">
+            <i class="fas fa-plus"></i> Add
+          </button>
+        </div>
+
+        <h4>Pick a category</h4>
+        <div class="options">
+          <label>
+            <input type="radio" name="category" id="category1" value="business" checked>
+            <span class="bubble business"></span>
+            <div>Business</div>
+          </label>
+          <label>
+            <input type="radio" name="category" id="category2" value="personal">
+            <span class="bubble personal"></span>
+            <div>Personal</div>
+          </label>
+          <label>
+            <input type="radio" name="category" id="category3" value="health">
+            <span class="bubble health"></span>
+            <div>Health</div>
+          </label>
+        </div>
+      </form>
+    </section>
+
+    <section class="todo-list">
+      <div class="list-header">
+        <h3>TODO LIST</h3>
+        <div class="filter-options">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="business">Business</button>
+          <button class="filter-btn" data-filter="personal">Personal</button>
+          <button class="filter-btn" data-filter="health">Health</button>
+        </div>
+      </div>
+      <div class="list" id="todo-list"></div>
+      <div class="stats">
+        <span id="total-count">0 items</span>
+        <span id="completed-count">0 completed</span>
+        <button id="clear-completed">Clear Completed</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

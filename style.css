@@ -1,0 +1,161 @@
+:root {
+  --primary: #54ea40;
+  --business: #3A82EE;
+  --personal: #EA40A4;
+  --health: #FF9F1C;
+  --light: #EEE;
+  --dark: #313154;
+  --grey: #888;
+  --danger: #ff5b57;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --business-glow: 0px 0px 4px rgba(58, 130, 238, 0.75);
+  --personal-glow: 0px 0px 4px rgba(234, 64, 164, 0.75);
+  --health-glow: 0px 0px 4px rgba(255, 159, 28, 0.75);
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+  --light: #1a1a2e;
+  --dark: #EEE;
+  --grey: #AAA;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+  background: var(--light);
+  color: var(--dark);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.theme-toggle button {
+  background: none;
+  border: none;
+  color: var(--dark);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+
+/* ... (keep existing styles) */
+
+/* New styles */
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-group input {
+  flex: 1;
+}
+
+.add-btn {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 5rem;
+  padding: 0 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: var(--personal-glow);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filter-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--dark);
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--grey);
+}
+
+#clear-completed {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+}
+
+/* Health category */
+.bubble.health {
+  border-color: var(--health);
+  box-shadow: var(--health-glow);
+}
+
+.bubble.health::after {
+  background-color: var(--health);
+  box-shadow: var(--health-glow);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .filter-options {
+    flex-wrap: wrap;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
