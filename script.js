@@ -1,57 +1,31 @@
-window.addEventListener('load', () => {
-  // Initialize todos and UI
-  let todos = JSON.parse(localStorage.getItem('todos')) || [];
-  const nameInput = document.querySelector('#name');
-  const newTodoForm = document.querySelector('#new-todo-form');
-  const todoList = document.querySelector('#todo-list');
-  const themeSwitcher = document.querySelector('#theme-switcher');
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM Elements
+  const themeSwitcher = document.getElementById('theme-switcher');
+  const nameInput = document.getElementById('name');
+  const todoForm = document.getElementById('new-todo-form');
+  const todoInput = document.getElementById('content');
+  const todoList = document.getElementById('todo-list');
   const filterButtons = document.querySelectorAll('.filter-btn');
-  const clearCompletedBtn = document.querySelector('#clear-completed');
-  const totalCount = document.querySelector('#total-count');
-  const completedCount = document.querySelector('#completed-count');
+  const totalCount = document.getElementById('total-count');
+  const completedCount = document.getElementById('completed-count');
+  const clearCompletedButton = document.getElementById('clear-completed');
 
-  // Set username
-  const username = localStorage.getItem('username') || '';
-  nameInput.value = username;
-
-  nameInput.addEventListener('change', (e) => {
-    localStorage.setItem('username', e.target.value);
-  });
-
-  // Theme switcher
-  const currentTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', currentTheme);
-  themeSwitcher.innerHTML = currentTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
-  themeSwitcher.addEventListener('click', () => {
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    themeSwitcher.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-  });
-
-  // Form submission
-  newTodoForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const content = e.target.elements.content.value.trim();
-    if (!content) return;
-
-    const todo = {
-      id: Date.now(),
-      content,
-      category: e.target.elements.category.value,
-      done: false,
-      createdAt: new Date().getTime(),
-    };
-
-    todos.push(todo);
-    saveAndRender();
-    e.target.reset();
-    e.target.elements.content.focus();
-  });
-
-  // Filter todos
+  // State
+  let todos = JSON.parse(localStorage.getItem('todos')) || [];
   let currentFilter = 'all';
+  let darkMode = localStorage.getItem('darkMode') === 'true';
+
+  // Initialize
+  initTheme();
+  renderTodos();
+  updateStats();
+
+  // Event Listeners
+  themeSwitcher.addEventListener('click', toggleTheme);
+  nameInput.addEventListener('change', updateName);
+  todoForm.addEventListener('submit', addTodo);
+  clearCompletedButton.addEventListener('click', clearCompletedTodos);
+
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
       filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -61,101 +35,148 @@ window.addEventListener('load', () => {
     });
   });
 
-  // Clear completed
-  clearCompletedBtn.addEventListener('click', () => {
-    todos = todos.filter(todo => !todo.done);
-    saveAndRender();
-  });
+  // Functions
+  function initTheme() {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+      themeSwitcher.innerHTML = '<i class="fas fa-sun"></i>';
+    } else {
+      document.body.classList.remove('dark-mode');
+      themeSwitcher.innerHTML = '<i class="fas fa-moon"></i>';
+    }
+  }
 
-  // Render todos
+  function toggleTheme() {
+    darkMode = !darkMode;
+    localStorage.setItem('darkMode', darkMode);
+    initTheme();
+  }
+
+  function updateName(e) {
+    localStorage.setItem('username', e.target.value);
+  }
+
+  function addTodo(e) {
+    e.preventDefault();
+    
+    const content = todoInput.value.trim();
+    if (!content) return;
+    
+    const category = document.querySelector('input[name="category"]:checked').value;
+    
+    const newTodo = {
+      id: Date.now(),
+      content,
+      category,
+      done: false,
+      createdAt: new Date().toISOString()
+    };
+    
+    todos.push(newTodo);
+    saveTodos();
+    renderTodos();
+    updateStats();
+    
+    todoInput.value = '';
+    todoInput.focus();
+  }
+
   function renderTodos() {
     todoList.innerHTML = '';
     
-    const filteredTodos = currentFilter === 'all' 
-      ? todos 
-      : todos.filter(todo => todo.category === currentFilter);
-
-    updateStats();
-
+    const filteredTodos = todos.filter(todo => {
+      if (currentFilter === 'all') return true;
+      return todo.category === currentFilter;
+    });
+    
     if (filteredTodos.length === 0) {
-      todoList.innerHTML = `<p class="empty-message">No ${currentFilter === 'all' ? '' : currentFilter} todos found</p>`;
+      todoList.innerHTML = '<p class="empty-message">No todos found</p>';
       return;
     }
-
+    
     filteredTodos.forEach(todo => {
-      const todoItem = document.createElement('div');
-      todoItem.classList.add('todo-item');
-      if (todo.done) todoItem.classList.add('done');
-
-      todoItem.innerHTML = `
+      const todoElement = document.createElement('div');
+      todoElement.classList.add('todo-item');
+      if (todo.done) todoElement.classList.add('done');
+      
+      todoElement.innerHTML = `
         <label>
-          <input type="checkbox" ${todo.done ? 'checked' : ''}>
+          <input type="checkbox" ${todo.done ? 'checked' : ''} data-id="${todo.id}">
           <span class="bubble ${todo.category}"></span>
+          <div class="todo-content">
+            <input type="text" value="${todo.content}" data-id="${todo.id}">
+          </div>
         </label>
-        <div class="todo-content">
-          <input type="text" value="${todo.content}" readonly>
-        </div>
         <div class="actions">
-          <button class="edit"><i class="fas fa-edit"></i></button>
-          <button class="delete"><i class="fas fa-trash"></i></button>
+          <button class="delete-btn" data-id="${todo.id}">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       `;
-
-      const checkbox = todoItem.querySelector('input[type="checkbox"]');
-      const contentInput = todoItem.querySelector('.todo-content input');
-      const editBtn = todoItem.querySelector('.edit');
-      const deleteBtn = todoItem.querySelector('.delete');
-
-      checkbox.addEventListener('change', () => {
-        todo.done = checkbox.checked;
-        saveAndRender();
-      });
-
-      editBtn.addEventListener('click', () => {
-        contentInput.removeAttribute('readonly');
-        contentInput.focus();
-      });
-
-      contentInput.addEventListener('blur', () => {
-        contentInput.setAttribute('readonly', true);
-        todo.content = contentInput.value;
-        saveTodos();
-      });
-
-      contentInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          contentInput.blur();
-        }
-      });
-
-      deleteBtn.addEventListener('click', () => {
-        todos = todos.filter(t => t.id !== todo.id);
-        saveAndRender();
-      });
-
-      todoList.appendChild(todoItem);
+      
+      todoList.appendChild(todoElement);
+    });
+    
+    // Add event listeners to new elements
+    document.querySelectorAll('.todo-item input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', toggleTodo);
+    });
+    
+    document.querySelectorAll('.todo-content input').forEach(input => {
+      input.addEventListener('change', updateTodoContent);
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', deleteTodo);
     });
   }
 
-  // Update stats
+  function toggleTodo(e) {
+    const id = parseInt(e.target.dataset.id);
+    const todo = todos.find(t => t.id === id);
+    todo.done = e.target.checked;
+    saveTodos();
+    renderTodos();
+    updateStats();
+  }
+
+  function updateTodoContent(e) {
+    const id = parseInt(e.target.dataset.id);
+    const todo = todos.find(t => t.id === id);
+    todo.content = e.target.value.trim();
+    saveTodos();
+  }
+
+  function deleteTodo(e) {
+    const id = parseInt(e.target.closest('button').dataset.id);
+    todos = todos.filter(t => t.id !== id);
+    saveTodos();
+    renderTodos();
+    updateStats();
+  }
+
+  function clearCompletedTodos() {
+    todos = todos.filter(t => !t.done);
+    saveTodos();
+    renderTodos();
+    updateStats();
+  }
+
   function updateStats() {
     const total = todos.length;
-    const completed = todos.filter(todo => todo.done).length;
+    const completed = todos.filter(t => t.done).length;
+    
     totalCount.textContent = `${total} ${total === 1 ? 'item' : 'items'}`;
     completedCount.textContent = `${completed} completed`;
   }
 
-  // Save todos
   function saveTodos() {
     localStorage.setItem('todos', JSON.stringify(todos));
   }
 
-  // Save and render
-  function saveAndRender() {
-    saveTodos();
-    renderTodos();
+  // Load saved name if exists
+  const savedName = localStorage.getItem('username');
+  if (savedName) {
+    nameInput.value = savedName;
   }
-
-  // Initial render
-  renderTodos();
 });
