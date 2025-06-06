@@ -27,8 +27,8 @@ A clean, responsive Todo List App built with **HTML**, **CSS**, and **JavaScript
 
 ## 📸 Screenshot
 
-![Todo App Screenshot](./![sk todo app](https://github.com/user-attachments/assets/e2c60465-a63a-471f-8ffe-8aa8b55cae80)
-) 
+![sk todo app](https://github.com/user-attachments/assets/e2c60465-a63a-471f-8ffe-8aa8b55cae80)
+
 
 ---
 
